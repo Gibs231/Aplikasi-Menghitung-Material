@@ -89,6 +89,7 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
     }
 
     Column(modifier = modifier) {
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -99,6 +100,8 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                     val newState = parentState != androidx.compose.ui.state.ToggleableState.On
                     childCheckedStates.forEachIndexed { index, _ ->
                         childCheckedStates[index] = newState
+
+                        if (!newState) packageCounts[index] = 0
                     }
                 }
             )
@@ -121,10 +124,24 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                     checked = childCheckedStates[index],
                     onCheckedChange = { isChecked ->
                         childCheckedStates[index] = isChecked
+                        if(!isChecked) packageCounts[index] = 0
                     }
                 )
+                if (childCheckedStates[index]) {
+                    Slider(
+                        value = packageCounts[index].toFloat(),
+                        onValueChange = { newCount ->
+                            packageCounts[index] = newCount.toInt()
+                        },
+                        valueRange = 1f..10f,
+                        steps = 9,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    Text("Jumlah Paket: ${packageCounts[index]}")
+                }
             }
         }
+        Text("Total Harga: Rp ${"%,.0f".format(totalPrice)}")
     }
 
     if (childCheckedStates.all { it }) {
