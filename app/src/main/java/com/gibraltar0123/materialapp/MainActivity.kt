@@ -4,28 +4,20 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TriStateCheckbox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.gibraltar0123.materialapp.model.MaterialOption
+import androidx.compose.ui.unit.dp
 import com.gibraltar0123.materialapp.ui.theme.MaterialAppTheme
+import com.gibraltar0123.materialapp.model.MaterialOption
+
 
 
 class MainActivity : ComponentActivity() {
@@ -103,12 +95,32 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
         }
 
 
-
+        materialOptions.forEachIndexed { index, material ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = material.imageResId),
+                    contentDescription = material.name,
+                    modifier = Modifier.size(180.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(material.name)
+                Checkbox(
+                    checked = childCheckedStates[index],
+                    onCheckedChange = { isChecked ->
+                        childCheckedStates[index] = isChecked
                     }
-
+                )
             }
+        }
+    }
 
-
+    if (childCheckedStates.all { it }) {
+        Text("All options selected")
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
