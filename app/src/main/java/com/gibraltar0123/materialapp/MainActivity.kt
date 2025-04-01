@@ -19,14 +19,15 @@ import com.gibraltar0123.materialapp.ui.theme.MaterialAppTheme
 import com.gibraltar0123.materialapp.model.MaterialOption
 
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialAppTheme {
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     MainScreen()
                 }
             }
@@ -64,18 +65,27 @@ fun MainScreen() {
 fun CheckboxParentExample(modifier: Modifier = Modifier) {
 
     val materialOptions = listOf(
-        MaterialOption(name = "Semen", imageResId = R.drawable.semen),
-        MaterialOption(name = "Kayu", imageResId = R.drawable.kayu),
-        MaterialOption(name = "BatuBata", imageResId = R.drawable.batamerah)
+        MaterialOption(name = "Semen", imageResId = R.drawable.semen, pricePerPackage = 50000.0),
+        MaterialOption(name = "Kayu", imageResId = R.drawable.kayu, pricePerPackage = 100000.0),
+        MaterialOption(
+            name = "BatuBata",
+            imageResId = R.drawable.batamerah,
+            pricePerPackage = 20000.0
+        )
     )
 
 
     val childCheckedStates = remember { mutableStateListOf(false, false, false) }
+    val packageCounts = remember { mutableStateListOf(0, 0, 0) }
 
     val parentState = when {
         childCheckedStates.all { it } -> androidx.compose.ui.state.ToggleableState.On
         childCheckedStates.none { it } -> androidx.compose.ui.state.ToggleableState.Off
         else -> androidx.compose.ui.state.ToggleableState.Indeterminate
+    }
+
+    val totalPrice = materialOptions.indices.sumOf { index ->
+        if (childCheckedStates[index]) materialOptions[index].pricePerPackage * packageCounts[index] else 0.0
     }
 
     Column(modifier = modifier) {
