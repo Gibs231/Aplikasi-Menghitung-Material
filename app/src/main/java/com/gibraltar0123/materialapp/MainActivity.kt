@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -63,17 +65,12 @@ fun MainScreen() {
 
 @Composable
 fun CheckboxParentExample(modifier: Modifier = Modifier) {
-
     val materialOptions = listOf(
         MaterialOption(name = "Semen", imageResId = R.drawable.semen, pricePerPackage = 50000.0),
         MaterialOption(name = "Kayu", imageResId = R.drawable.kayu, pricePerPackage = 100000.0),
-        MaterialOption(
-            name = "BatuBata",
-            imageResId = R.drawable.batamerah,
-            pricePerPackage = 20000.0
+        MaterialOption(name = "BatuBata", imageResId = R.drawable.batamerah, pricePerPackage = 20000.0
         )
     )
-
 
     val childCheckedStates = remember { mutableStateListOf(false, false, false) }
     val packageCounts = remember { mutableStateListOf(0, 0, 0) }
@@ -88,11 +85,10 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
         if (childCheckedStates[index]) materialOptions[index].pricePerPackage * packageCounts[index] else 0.0
     }
 
-    Column(modifier = modifier) {
+    val scrollState = rememberScrollState()
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    Column(modifier = modifier.verticalScroll(scrollState)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Select all")
             TriStateCheckbox(
                 state = parentState,
@@ -100,47 +96,56 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                     val newState = parentState != androidx.compose.ui.state.ToggleableState.On
                     childCheckedStates.forEachIndexed { index, _ ->
                         childCheckedStates[index] = newState
-
                         if (!newState) packageCounts[index] = 0
                     }
                 }
             )
         }
 
-
         materialOptions.forEachIndexed { index, material ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = material.imageResId),
-                    contentDescription = material.name,
-                    modifier = Modifier.size(180.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(material.name)
-                Checkbox(
-                    checked = childCheckedStates[index],
-                    onCheckedChange = { isChecked ->
-                        childCheckedStates[index] = isChecked
-                        if(!isChecked) packageCounts[index] = 0
-                    }
-                )
-                if (childCheckedStates[index]) {
-                    Slider(
-                        value = packageCounts[index].toFloat(),
-                        onValueChange = { newCount ->
-                            packageCounts[index] = newCount.toInt()
-                        },
-                        valueRange = 1f..10f,
-                        steps = 9,
-                        modifier = Modifier.padding(start = 8.dp)
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = material.imageResId),
+                        contentDescription = material.name,
+                        modifier = Modifier.size(180.dp)
                     )
-                    Text("Jumlah Paket: ${packageCounts[index]}")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(material.name)
+                    Checkbox(
+                        checked = childCheckedStates[index],
+                        onCheckedChange = { isChecked ->
+                            childCheckedStates[index] = isChecked
+                            if (!isChecked) packageCounts[index] = 0
+                        }
+                    )
+                }
+
+
+                if (childCheckedStates[index]) {
+                    var text by remember { mutableStateOf(packageCounts[index].toString()) }
+
+                    TextField(
+                        value = text,
+                        onValueChange = { newText ->
+
+                            if (newText.isEmpty() || newText.toIntOrNull() != null) {
+                                text = newText
+                                val number = newText.toIntOrNull()
+                                if (number != null && number in 1..10000) {
+                                    packageCounts[index] = number
+                                } else if (newText.isEmpty()) {
+                                    packageCounts[index] = 0
+                                }
+                            }
+                        },
+                        label = { Text("Jumlah Paket") },
+                        modifier = Modifier.width(180.dp)
+                    )
                 }
             }
         }
+
         Text("Total Harga: Rp ${"%,.0f".format(totalPrice)}")
     }
 
@@ -148,6 +153,7 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
         Text("All options selected")
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
