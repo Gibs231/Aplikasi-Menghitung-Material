@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.gibraltar0123.materialapp.ui.theme.MaterialAppTheme
 import com.gibraltar0123.materialapp.model.MaterialOption
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +67,7 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
     val materialOptions = listOf(
         MaterialOption(name = "Semen", imageResId = R.drawable.semen, pricePerPackage = 50000.0),
         MaterialOption(name = "Kayu", imageResId = R.drawable.kayu, pricePerPackage = 100000.0),
-        MaterialOption(name = "BatuBata", imageResId = R.drawable.batamerah, pricePerPackage = 20000.0
-        )
+        MaterialOption(name = "BatuBata", imageResId = R.drawable.batamerah, pricePerPackage = 20000.0)
     )
 
     val childCheckedStates = remember { mutableStateListOf(false, false, false) }
@@ -89,7 +87,7 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.verticalScroll(scrollState)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Select all")
+            Text(stringResource(id = R.string.select_all))
             TriStateCheckbox(
                 state = parentState,
                 onClick = {
@@ -121,14 +119,12 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                     )
                 }
 
-
                 if (childCheckedStates[index]) {
                     var text by remember { mutableStateOf(packageCounts[index].toString()) }
 
                     TextField(
                         value = text,
                         onValueChange = { newText ->
-
                             if (newText.isEmpty() || newText.toIntOrNull() != null) {
                                 text = newText
                                 val number = newText.toIntOrNull()
@@ -139,21 +135,20 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                                 }
                             }
                         },
-                        label = { Text("Jumlah Paket") },
+                        label = { Text(stringResource(id = R.string.package_count_label)) },
                         modifier = Modifier.width(180.dp)
                     )
                 }
             }
         }
 
-        Text("Total Harga: Rp ${"%,.0f".format(totalPrice)}")
-    }
+        Text(stringResource(id = R.string.total_price_label, totalPrice))
 
-    if (childCheckedStates.all { it }) {
-        Text("All options selected")
+        if (childCheckedStates.all { it }) {
+            Text(stringResource(id = R.string.all_options_selected))
+        }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
