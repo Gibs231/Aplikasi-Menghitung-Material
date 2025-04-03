@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">materialApp</string>
+    <string name="package_count_label">Total Paket</string>
+    <string name="total_price_label">Total Harga Rp %1$s</string>
+    <string name="input_must_number">Masukan Angka</string>
+    <string name="select_all">Pilih Semua</string>
+    <string name="all_options_selected">Semua Opsi Telah Dipilih</string>
+</resources>
