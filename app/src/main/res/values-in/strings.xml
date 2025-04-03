@@ -8,5 +8,6 @@
     <string name="all_options_selected">Semua Opsi Telah Terpilih</string>
     <string name="about_application">Tentang Aplikasi</string>
     <string name="share_template">Total Harga Pembelian Material</string>
-    <string name="Share">Berbagi</string>
+    <string name="share">Berbagi</string>
+    <string name="back">Kembali</string>
 </resources>

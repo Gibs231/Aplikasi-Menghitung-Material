@@ -1,8 +1,12 @@
 package com.gibraltar0123.materialapp.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -11,18 +15,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import com.gibraltar0123.materialapp.CheckboxParentExample
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.gibraltar0123.materialapp.R
+import com.gibraltar0123.materialapp.ui.screen.CheckboxParentExample
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun AboutScreen(navController: NavHostController ) {
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
                 title = {
                     Text(
-                        text = stringResource(id = R.string.app_name),
+                        text = stringResource(id = R.string.about_application),
                         color = Color.White
                     )
                 },
@@ -32,10 +47,14 @@ fun MainScreen() {
             )
         }
     ) { innerPadding ->
-        CheckboxParentExample(
+        Text(
+            text = stringResource(R.string.copyright),
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
+                .padding(16.dp)
         )
+
+
+        CheckboxParentExample()
     }
 }

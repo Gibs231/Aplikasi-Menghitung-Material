@@ -7,6 +7,8 @@
     <string name="all_options_selected">All Option Has Been Selected</string>
     <string name="about_application">About Application.</string>
     <string name="share_template"> Total Purchase Price Material:\n\n%1$s\n\nTotal: Rp %2$.2f.</string>
+    <string name="share">Share</string>
 
-    <string name="Share">Share.</string>
+    <string name="copyright" translatable="false">Aplikasi ini memungkinkan penjaga toko bahan material untuk menghitung total pembelanjaan bahan material yang dibeli oleh pembeli, dengan beberapa fitur yang memudahkan seperti checkBox button yang disertai gambar material yang akan dibeli. Nantinya, material-material yang ada akan dijual per paket, sehingga perhitungannya dilakukan berdasarkan paket dengan jenis material yang berbeda-beda.\n\nAplikasi ini dibuat untuk membantu pengelolaan transaksi di toko bahan material.\n\nCopyright © 2024-2025 Muhamad Gibraltar.\nAll rights reserved.</string>
+    <string name="back">Back</string>
 </resources>
