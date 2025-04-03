@@ -5,4 +5,8 @@
     <string name="input_exceeded_total_package">Input Exceeded Total Package</string>
     <string name="select_all">Select all</string>
     <string name="all_options_selected">All Option Has Been Selected</string>
+    <string name="about_application">About Application.</string>
+    <string name="share_template"> Total Harga Pembelian Material:\n\n%1$s\n\nTotal: Rp %2$.2f.</string>
+
+    <string name="Share">Share.</string>
 </resources>
