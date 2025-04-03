@@ -18,11 +18,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.gibraltar0123.materialapp.R
-import com.gibraltar0123.materialapp.ui.screen.CheckboxParentExample
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(navController: NavHostController ) {
+fun AboutScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -53,8 +52,5 @@ fun AboutScreen(navController: NavHostController ) {
                 .padding(innerPadding)
                 .padding(16.dp)
         )
-
-
-        CheckboxParentExample()
     }
 }
