@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">materialApp</string>
     <string name="package_count_label">Total Paket</string>
-    <string name="total_price_label">Total Harga Rp %1$s</string>
-    <string name="input_must_number">Masukan Angka</string>
-    <string name="select_all">Pilih Semua</string>
-    <string name="all_options_selected">Semua Opsi Telah Dipilih</string>
+    <string name="total_price_label">Total Price Rp %1$s</string>
+    <string name="input_exceeded_total_package">Input Melebihi Total Paket</string>
+    <string name="select_all">Terpiih Semua</string>
+    <string name="all_options_selected">Semua Opsi Telah Terpilih</string>
 </resources>
