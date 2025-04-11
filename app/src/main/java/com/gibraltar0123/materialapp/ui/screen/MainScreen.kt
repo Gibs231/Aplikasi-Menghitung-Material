@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -95,19 +96,17 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
     val childCheckedStates = remember { mutableStateListOf(false, false, false) }
     val packageCounts = remember { mutableStateListOf(0, 0, 0) }
 
+    var showTotal by remember { mutableStateOf(false) }
+
     val parentState = when {
         childCheckedStates.all { it } -> androidx.compose.ui.state.ToggleableState.On
         childCheckedStates.none { it } -> androidx.compose.ui.state.ToggleableState.Off
         else -> androidx.compose.ui.state.ToggleableState.Indeterminate
     }
 
-    val totalPrice = materialOptions.indices.sumOf { index ->
-        if (childCheckedStates[index]) materialOptions[index].pricePerPackage * packageCounts[index] else 0.0
-    }
-
     val scrollState = rememberScrollState()
 
-    Column(modifier = modifier.verticalScroll(scrollState)) {
+    Column(modifier = modifier.verticalScroll(scrollState).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(id = R.string.select_all))
             TriStateCheckbox(
@@ -151,8 +150,7 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                             if (newText.isEmpty() || newText.toIntOrNull() != null) {
                                 text = newText
                                 val number = newText.toIntOrNull()
-
-                                when  {
+                                when {
                                     number == null -> {
                                         packageCounts[index] = 0
                                         isError = false
@@ -173,7 +171,6 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                         isError = isError
                     )
 
-
                     if (isError) {
                         Text(
                             text = stringResource(id = R.string.input_exceeded_total_package),
@@ -185,15 +182,48 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
             }
         }
 
+        Spacer(modifier = Modifier.padding(8.dp))
 
-        Text(stringResource(id = R.string.total_price_label, totalPrice))
+
+        androidx.compose.material3.Button(
+            onClick = { showTotal = true }
+        ) {
+            Text("Hitung Total")
+        }
+
+        Spacer(modifier = Modifier.padding(8.dp))
+
+
+        if (showTotal) {
+            val totalPrice = materialOptions.indices.sumOf { index ->
+                if (childCheckedStates[index]) materialOptions[index].pricePerPackage * packageCounts[index] else 0.0
+            }
+
+            Text("🧾 Rincian Pembelian:", fontSize = 18.sp, color = Color.DarkGray)
+
+            materialOptions.forEachIndexed { index, material ->
+                if (childCheckedStates[index] && packageCounts[index] > 0) {
+                    val subtotal = material.pricePerPackage * packageCounts[index]
+                    Text(
+                        "- ${material.name} x ${packageCounts[index]} = Rp ${"%,.0f".format(subtotal)}",
+                        fontSize = 14.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Total Harga: Rp ${"%,.0f".format(totalPrice)}",
+                fontSize = 20.sp,
+                color = Color(0xFF4CAF50)
+            )
+        }
 
         if (childCheckedStates.all { it }) {
             Text(stringResource(id = R.string.all_options_selected))
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
