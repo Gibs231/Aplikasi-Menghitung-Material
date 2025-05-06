@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.gibraltar0123.materialapp.ui.screen.AboutScreen
 import com.gibraltar0123.materialapp.ui.screen.MainScreen
 
 

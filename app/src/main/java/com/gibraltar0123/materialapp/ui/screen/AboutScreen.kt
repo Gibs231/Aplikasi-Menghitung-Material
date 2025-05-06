@@ -1,4 +1,4 @@
-package com.gibraltar0123.materialapp.navigation
+package com.gibraltar0123.materialapp.ui.screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons

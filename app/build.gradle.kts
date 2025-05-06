@@ -8,6 +8,8 @@ android {
     namespace = "com.gibraltar0123.materialapp"
     compileSdk = 35
 
+
+
     defaultConfig {
         applicationId = "com.gibraltar0123.materialapp"
         minSdk = 23

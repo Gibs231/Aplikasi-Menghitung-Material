@@ -1,40 +1,25 @@
 package com.gibraltar0123.materialapp.ui.screen
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TriStateCheckbox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,7 +51,6 @@ fun MainScreen(navController: NavHostController) {
                     IconButton(onClick = {
                         navController.navigate(Screen.About.route)
                     }) {
-
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = stringResource(R.string.about_application),
@@ -87,16 +71,17 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun CheckboxParentExample(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
     val materialOptions = listOf(
         MaterialOption(name = "Semen", imageResId = R.drawable.semen, pricePerPackage = 50000.0),
         MaterialOption(name = "Kayu", imageResId = R.drawable.kayu, pricePerPackage = 100000.0),
         MaterialOption(name = "BatuBata", imageResId = R.drawable.batamerah, pricePerPackage = 20000.0)
     )
 
-    val childCheckedStates = remember { mutableStateListOf(false, false, false) }
-    val packageCounts = remember { mutableStateListOf(0, 0, 0) }
-
-    var showTotal by remember { mutableStateOf(false) }
+    val childCheckedStates = rememberSaveableMutableStateList(List(materialOptions.size) { false })
+    val packageCounts = rememberSaveableMutableStateList(List(materialOptions.size) { 0 })
+    var showTotal by rememberSaveable { mutableStateOf(false) }
 
     val parentState = when {
         childCheckedStates.all { it } -> androidx.compose.ui.state.ToggleableState.On
@@ -113,7 +98,7 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                 state = parentState,
                 onClick = {
                     val newState = parentState != androidx.compose.ui.state.ToggleableState.On
-                    childCheckedStates.forEachIndexed { index, _ ->
+                    childCheckedStates.indices.forEach { index ->
                         childCheckedStates[index] = newState
                         if (!newState) packageCounts[index] = 0
                     }
@@ -141,21 +126,20 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
                 }
 
                 if (childCheckedStates[index]) {
-                    var text by remember { mutableStateOf(packageCounts[index].toString()) }
-                    var isError by remember { mutableStateOf(false) }
+                    var text by rememberSaveable { mutableStateOf(packageCounts[index].toString()) }
+                    var isError by rememberSaveable { mutableStateOf(false) }
 
                     TextField(
                         value = text,
                         onValueChange = { newText ->
                             if (newText.isEmpty() || newText.toIntOrNull() != null) {
                                 text = newText
-                                val number = newText.toIntOrNull()
-                                when {
-                                    number == null -> {
+                                when (val number = newText.toIntOrNull()) {
+                                    null -> {
                                         packageCounts[index] = 0
                                         isError = false
                                     }
-                                    number in 1..10000 -> {
+                                    in 1..10000 -> {
                                         packageCounts[index] = number
                                         isError = false
                                     }
@@ -182,46 +166,71 @@ fun CheckboxParentExample(modifier: Modifier = Modifier) {
             }
         }
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-
-        androidx.compose.material3.Button(
-            onClick = { showTotal = true }
-        ) {
+        Button(onClick = { showTotal = true }) {
             Text("Hitung Total")
         }
 
-        Spacer(modifier = Modifier.padding(8.dp))
-
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (showTotal) {
             val totalPrice = materialOptions.indices.sumOf { index ->
                 if (childCheckedStates[index]) materialOptions[index].pricePerPackage * packageCounts[index] else 0.0
             }
 
-            Text("🧾 Rincian Pembelian:", fontSize = 18.sp, color = Color.DarkGray)
+            Text("Rincian Pembelian:", fontSize = 18.sp, color = Color.DarkGray)
 
+            val resultBuilder = StringBuilder("Rincian Pembelian:\n")
             materialOptions.forEachIndexed { index, material ->
                 if (childCheckedStates[index] && packageCounts[index] > 0) {
                     val subtotal = material.pricePerPackage * packageCounts[index]
-                    Text(
-                        "- ${material.name} x ${packageCounts[index]} = Rp ${"%,.0f".format(subtotal)}",
-                        fontSize = 14.sp
-                    )
+                    val detail = "- ${material.name} x ${packageCounts[index]} = Rp ${"%,.0f".format(subtotal)}"
+                    Text(detail, fontSize = 14.sp)
+                    resultBuilder.appendLine(detail)
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "Total Harga: Rp ${"%,.0f".format(totalPrice)}",
-                fontSize = 20.sp,
-                color = Color(0xFF4CAF50)
-            )
+            val totalLine = "Total Harga: Rp ${"%,.0f".format(totalPrice)}"
+            Text(totalLine, fontSize = 20.sp, color = Color(0xFF4CAF50))
+            resultBuilder.appendLine(totalLine)
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                shareData(context, resultBuilder.toString())
+            }) {
+                Text("Bagikan")
+            }
         }
 
         if (childCheckedStates.all { it }) {
             Text(stringResource(id = R.string.all_options_selected))
         }
+    }
+}
+
+@Composable
+fun <T> rememberSaveableMutableStateList(initialList: List<T>): SnapshotStateList<T> {
+    return rememberSaveable(
+        saver = listSaver(
+            save = { it.toList() },
+            restore = { it.toMutableStateList() }
+        )
+    ) {
+        initialList.toMutableStateList()
+    }
+}
+
+@SuppressLint("QueryPermissionsNeeded")
+private fun shareData(context: Context, message: String) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, message)
+    }
+    val chooser = Intent.createChooser(intent, "Bagikan melalui")
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(chooser)
     }
 }
 
