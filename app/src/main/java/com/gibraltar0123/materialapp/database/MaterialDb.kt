@@ -8,10 +8,8 @@ import com.gibraltar0123.materialapp.model.MaterialOption
 
 @Database(entities = [MaterialOption::class], version = 1, exportSchema = false)
 abstract class MaterialDb : RoomDatabase() {
-    // Keep only one of these - I'm keeping this method since it follows standard Room naming conventions
+
     abstract fun materialDao(): MaterialDao
-
-
 
     companion object {
         @Volatile

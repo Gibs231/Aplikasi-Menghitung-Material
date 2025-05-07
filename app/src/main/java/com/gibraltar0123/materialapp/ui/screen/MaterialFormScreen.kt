@@ -1,23 +1,43 @@
 package com.gibraltar0123.materialapp.ui.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.gibraltar0123.materialapp.R
-import com.gibraltar0123.materialapp.model.MaterialOption
 import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
 import kotlinx.coroutines.launch
 
@@ -25,7 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MaterialFormScreen(
     navController: NavHostController,
-    viewModel: MaterialViewModel,
+    viewModel: MaterialViewModel = viewModel(), // Use viewModel() to obtain the ViewModel
     materialId: Long? = null
 ) {
     val scope = rememberCoroutineScope()
@@ -35,16 +55,13 @@ fun MaterialFormScreen(
     var price by rememberSaveable { mutableStateOf("") }
     var stock by rememberSaveable { mutableStateOf("") }
 
-
     val imageOptions = listOf(
         R.drawable.batamerah to "Bata",
         R.drawable.semen to "Semen",
         R.drawable.kayu to "Kayu"
-
     )
 
     var selectedImageResId by rememberSaveable { mutableStateOf(imageOptions.first().first) }
-
 
     LaunchedEffect(materialId) {
         if (materialId != null && materialId > 0) {
@@ -89,7 +106,7 @@ fun MaterialFormScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            // Material name field
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -110,7 +127,7 @@ fun MaterialFormScreen(
                     .padding(vertical = 8.dp)
             )
 
-
+            // Stock field
             OutlinedTextField(
                 value = stock,
                 onValueChange = { stock = it },
@@ -121,7 +138,7 @@ fun MaterialFormScreen(
                     .padding(vertical = 8.dp)
             )
 
-
+            // Image selection
             Text(
                 "Pilih Gambar Material",
                 modifier = Modifier
@@ -146,7 +163,7 @@ fun MaterialFormScreen(
                 }
             }
 
-
+            // Save button
             Button(
                 onClick = {
                     val priceValue = price.toDoubleOrNull() ?: 0.0
@@ -172,7 +189,7 @@ fun MaterialFormScreen(
                 Text(if (materialId == null) "Simpan Material" else "Update Material")
             }
 
-
+            // Delete button (only show when editing)
             if (materialId != null) {
                 Button(
                     onClick = {

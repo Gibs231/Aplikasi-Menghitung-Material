@@ -1,28 +1,27 @@
-package com.gibraltar0123.materialapp.ui.screen
+package com.gibraltar0123.materialapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.gibraltar0123.materialapp.ui.theme.MaterialAppTheme
-import com.gibraltar0123.materialapp.util.MaterialViewModelFactory
-import com.gibraltar0123.materialapp.database.MaterialDb
 import com.gibraltar0123.materialapp.navigation.SetupNavGraph
-import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
+import com.gibraltar0123.materialapp.ui.theme.MaterialAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Membuat instance MaterialViewModelFactory
-        val factory = MaterialViewModelFactory(applicationContext)
-        val viewModel = ViewModelProvider(this, factory).get(MaterialViewModel::class.java)
-
         setContent {
             MaterialAppTheme {
-                val navController = rememberNavController()
-                SetupNavGraph(navController = navController)
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+
+                    val navController = rememberNavController()
+                    SetupNavGraph(navController = navController)
+                }
             }
         }
     }
