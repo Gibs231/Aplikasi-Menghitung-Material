@@ -9,6 +9,7 @@ import com.gibraltar0123.materialapp.ui.theme.MaterialAppTheme
 import com.gibraltar0123.materialapp.util.MaterialViewModelFactory
 import com.gibraltar0123.materialapp.database.MaterialDb
 import com.gibraltar0123.materialapp.navigation.SetupNavGraph
+import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

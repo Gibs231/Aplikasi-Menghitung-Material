@@ -26,15 +26,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gibraltar0123.materialapp.R
 import com.gibraltar0123.materialapp.model.MaterialOption
 import com.gibraltar0123.materialapp.navigation.Screen
+import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
+import com.gibraltar0123.materialapp.util.MaterialViewModelFactory
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController, viewModel: MaterialViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,21 +68,21 @@ fun MainScreen(navController: NavHostController) {
         CheckboxParentExample(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
+            viewModel = viewModel
         )
     }
 }
 
 @Composable
-fun CheckboxParentExample(modifier: Modifier = Modifier) {
+fun CheckboxParentExample(
+    modifier: Modifier = Modifier,
+    viewModel: MaterialViewModel
+) {
     val context = LocalContext.current
+    val materialOptions by viewModel.allMaterials.collectAsState(initial = emptyList())
 
-    val materialOptions = listOf(
-        MaterialOption(name = "Semen", imageResId = R.drawable.semen, pricePerPackage = 50000.0),
-        MaterialOption(name = "Kayu", imageResId = R.drawable.kayu, pricePerPackage = 100000.0),
-        MaterialOption(name = "BatuBata", imageResId = R.drawable.batamerah, pricePerPackage = 20000.0)
-    )
-
+    // Sinkronisasi state list
     val childCheckedStates = rememberSaveableMutableStateList(List(materialOptions.size) { false })
     val packageCounts = rememberSaveableMutableStateList(List(materialOptions.size) { 0 })
     var showTotal by rememberSaveable { mutableStateOf(false) }
@@ -231,14 +235,5 @@ private fun shareData(context: Context, message: String) {
     val chooser = Intent.createChooser(intent, "Bagikan melalui")
     if (intent.resolveActivity(context.packageManager) != null) {
         context.startActivity(chooser)
-    }
-}
-
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    MaterialTheme {
-        MainScreen(rememberNavController())
     }
 }
