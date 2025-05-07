@@ -1,6 +1,7 @@
 package com.gibraltar0123.materialapp.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -17,6 +18,10 @@ interface MaterialDao {
     @Update
     suspend fun update(material: MaterialOption)
 
+    @Delete
+    suspend fun delete(material: MaterialOption)
+
     @Query("SELECT * FROM material ORDER BY name ASC")
     fun getAllMaterials(): Flow<List<MaterialOption>>
+    abstract fun getMaterialById(id: Long): MaterialOption?
 }
