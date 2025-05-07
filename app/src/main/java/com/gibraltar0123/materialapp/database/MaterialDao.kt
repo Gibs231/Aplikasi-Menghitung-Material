@@ -25,5 +25,5 @@ interface MaterialDao {
     suspend fun getMaterialById(id: Long): MaterialOption?
 
     @Query("SELECT * FROM material")
-    fun getAllMaterials(): Flow<List<MaterialOption>>  // Tambahkan query ini
+    fun getAllMaterials(): Flow<List<MaterialOption>>
 }
