@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.gibraltar0123.materialapp.database.MaterialDb
 import com.gibraltar0123.materialapp.ui.screen.MaterialViewModel
-import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
 
 class MaterialViewModelFactory(
     private val context: Context

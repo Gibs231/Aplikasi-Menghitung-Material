@@ -8,6 +8,7 @@ import com.gibraltar0123.materialapp.model.MaterialOption
 
 @Database(entities = [MaterialOption::class], version = 1, exportSchema = false)
 abstract class MaterialDb : RoomDatabase() {
+    abstract fun materialDao(): MaterialDao
 
     abstract val dao: MaterialDao
 

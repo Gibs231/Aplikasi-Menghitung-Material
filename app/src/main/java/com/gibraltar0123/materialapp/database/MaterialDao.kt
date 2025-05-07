@@ -21,7 +21,9 @@ interface MaterialDao {
     @Delete
     suspend fun delete(material: MaterialOption)
 
-    @Query("SELECT * FROM material ORDER BY name ASC")
-    fun getAllMaterials(): Flow<List<MaterialOption>>
-    abstract fun getMaterialById(id: Long): MaterialOption?
+    @Query("SELECT * FROM material WHERE id = :id LIMIT 1")
+    suspend fun getMaterialById(id: Long): MaterialOption?
+
+    @Query("SELECT * FROM material")
+    fun getAllMaterials(): Flow<List<MaterialOption>>  // Tambahkan query ini
 }

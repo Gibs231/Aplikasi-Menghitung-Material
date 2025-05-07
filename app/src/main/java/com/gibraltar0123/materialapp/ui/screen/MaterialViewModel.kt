@@ -1,5 +1,4 @@
-package com.gibraltar0123.materialapp.ui.screen
-
+package com.gibraltar0123.materialapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
