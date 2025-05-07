@@ -21,7 +21,7 @@ interface MaterialDao {
     @Delete
     suspend fun delete(material: MaterialOption)
 
-    @Query("SELECT * FROM material WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM material WHERE id = :id")
     suspend fun getMaterialById(id: Long): MaterialOption?
 
     @Query("SELECT * FROM material")
