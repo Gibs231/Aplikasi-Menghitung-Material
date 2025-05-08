@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,6 +35,8 @@ import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController, viewModel: MaterialViewModel) {
+    val checkoutItemCount by viewModel.checkoutItems.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -47,6 +50,27 @@ fun MainScreen(navController: NavHostController, viewModel: MaterialViewModel) {
                     containerColor = Color(0xFF795548),
                 ),
                 actions = {
+                    // Checkout button with badge
+                    BadgedBox(
+                        badge = {
+                            if (checkoutItemCount.isNotEmpty()) {
+                                Badge {
+                                    Text(checkoutItemCount.size.toString())
+                                }
+                            }
+                        }
+                    ) {
+                        IconButton(onClick = {
+                            navController.navigate(Screen.Checkout.route)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = "Checkout",
+                                tint = Color.White
+                            )
+                        }
+                    }
+
                     IconButton(onClick = {
                         navController.navigate(Screen.About.route)
                     }) {
@@ -108,7 +132,7 @@ fun CheckboxParentExample(
     }
 
     var showTotal by rememberSaveable { mutableStateOf(false) }
-    var totalPrice by rememberSaveable { mutableStateOf(0.0) }
+    var totalPrice by rememberSaveable { mutableDoubleStateOf(0.0) }
 
     val parentState = when {
         childCheckedStates.all { it } -> androidx.compose.ui.state.ToggleableState.On
@@ -226,20 +250,49 @@ fun CheckboxParentExample(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {
-                    totalPrice = materialOptions.indices.sumOf { index ->
-                        if (childCheckedStates[index]) {
-                            materialOptions[index].pricePerPackage * packageCounts[index]
-                        } else 0.0
-                    }
-                    showTotal = true
-                },
-                enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
-                    checked && packageCounts.getOrNull(index)?.let { it > 0 } ?: false
-                }.any { it }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Hitung Total")
+                Button(
+                    onClick = {
+                        totalPrice = materialOptions.indices.sumOf { index ->
+                            if (childCheckedStates[index]) {
+                                materialOptions[index].pricePerPackage * packageCounts[index]
+                            } else 0.0
+                        }
+                        showTotal = true
+                    },
+                    enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
+                        checked && packageCounts.getOrNull(index)?.let { it > 0 } ?: false
+                    }.any { it }
+                ) {
+                    Text("Hitung Total")
+                }
+
+                Button(
+                    onClick = {
+                        // Filter out items with quantities
+                        val selectedMaterials = materialOptions.filterIndexed { index, _ ->
+                            childCheckedStates[index] && packageCounts[index] > 0
+                        }
+                        val selectedQuantities = packageCounts.filterIndexed { index, _ ->
+                            childCheckedStates[index] && packageCounts[index] > 0
+                        }
+
+                        viewModel.addToCheckout(selectedMaterials, selectedQuantities)
+
+                        // Show a toast or snackbar indicating items were added to cart
+                        // Navigate to checkout screen
+                        navController.navigate(Screen.Checkout.route)
+                    },
+                    enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
+                        checked && packageCounts.getOrNull(index)?.let { it > 0 } ?: false
+                    }.any { it },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
+                ) {
+                    Text("Tambah ke Checkout")
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

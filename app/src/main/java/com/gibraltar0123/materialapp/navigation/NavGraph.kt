@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gibraltar0123.materialapp.ui.screen.AboutScreen
+import com.gibraltar0123.materialapp.ui.screen.CheckoutScreen
 import com.gibraltar0123.materialapp.ui.screen.MainScreen
 import com.gibraltar0123.materialapp.ui.screen.MaterialFormScreen
 import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
@@ -18,7 +19,6 @@ import com.gibraltar0123.materialapp.util.MaterialViewModelFactory
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
     val context = LocalContext.current
-
 
     val materialViewModel: MaterialViewModel = viewModel(
         factory = MaterialViewModelFactory(context)
@@ -38,6 +38,10 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
 
         composable(route = Screen.AddMaterial.route) {
             MaterialFormScreen(navController, materialViewModel)
+        }
+
+        composable(route = Screen.Checkout.route) {
+            CheckoutScreen(navController, materialViewModel)
         }
 
         composable(

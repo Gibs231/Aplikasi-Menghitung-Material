@@ -28,6 +28,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -58,7 +59,7 @@ fun MaterialFormScreen(
     var price by rememberSaveable { mutableStateOf("") }
     var stock by rememberSaveable { mutableStateOf("") }
 
-    // State for delete confirmation dialog
+
     var showDeleteConfirmation by rememberSaveable { mutableStateOf(false) }
 
     val imageOptions = listOf(
@@ -67,7 +68,7 @@ fun MaterialFormScreen(
         R.drawable.kayu to "Kayu"
     )
 
-    var selectedImageResId by rememberSaveable { mutableStateOf(imageOptions.first().first) }
+    var selectedImageResId by rememberSaveable { mutableIntStateOf(imageOptions.first().first) }
 
     LaunchedEffect(materialId) {
         if (materialId != null && materialId > 0) {
@@ -81,7 +82,7 @@ fun MaterialFormScreen(
         }
     }
 
-    // Delete confirmation dialog
+
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
@@ -144,7 +145,7 @@ fun MaterialFormScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Material name field
+
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -154,7 +155,7 @@ fun MaterialFormScreen(
                     .padding(vertical = 8.dp)
             )
 
-            // Price field
+
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
@@ -165,7 +166,7 @@ fun MaterialFormScreen(
                     .padding(vertical = 8.dp)
             )
 
-            // Stock field
+
             OutlinedTextField(
                 value = stock,
                 onValueChange = { stock = it },
@@ -176,7 +177,7 @@ fun MaterialFormScreen(
                     .padding(vertical = 8.dp)
             )
 
-            // Image selection
+
             Text(
                 stringResource(R.string.select_material_image),
                 modifier = Modifier
@@ -184,7 +185,6 @@ fun MaterialFormScreen(
                     .align(Alignment.Start)
             )
 
-            // Display image options as radio buttons
             imageOptions.forEach { (imageResId, imageName) ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -201,7 +201,7 @@ fun MaterialFormScreen(
                 }
             }
 
-            // Save button
+
             Button(
                 onClick = {
                     val priceValue = price.toDoubleOrNull() ?: 0.0
@@ -209,13 +209,13 @@ fun MaterialFormScreen(
 
                     scope.launch {
                         if (materialId == null) {
-                            // Insert new material
+
                             viewModel.insert(name, priceValue, stockValue, selectedImageResId)
                         } else {
-                            // Update existing material
+
                             viewModel.update(materialId, name, priceValue, stockValue, selectedImageResId)
                         }
-                        // Navigate back
+
                         navController.popBackStack()
                     }
                 },
@@ -227,7 +227,6 @@ fun MaterialFormScreen(
                 Text(stringResource(if (materialId == null) R.string.save_material else R.string.update_material))
             }
 
-            // Delete button (only show when editing)
             if (materialId != null) {
                 Button(
                     onClick = { showDeleteConfirmation = true },  // Show confirmation dialog instead of direct delete
