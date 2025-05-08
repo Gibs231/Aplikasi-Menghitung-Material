@@ -5,7 +5,17 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -13,11 +23,31 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -167,9 +197,11 @@ fun CheckboxParentExample(
     // Define a common button color for both buttons
     val buttonColor = Color(0xFF2196F3)
 
-    Column(modifier = modifier
-        .verticalScroll(scrollState)
-        .padding(16.dp)) {
+    Column(
+        modifier = modifier
+            .verticalScroll(scrollState)
+            .padding(16.dp)
+    ) {
         if (materialOptions.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -318,8 +350,7 @@ fun CheckboxParentExample(
 
                         viewModel.addToCheckout(selectedMaterials, selectedQuantities)
 
-                        // Show a toast or snackbar indicating items were added to cart
-                        // Navigate to checkout screen
+
                         navController.navigate(Screen.Checkout.route)
                     },
                     enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
@@ -371,17 +402,6 @@ fun CheckboxParentExample(
     }
 }
 
-@Composable
-fun <T> rememberSaveableMutableStateList(initialList: List<T>): SnapshotStateList<T> {
-    return rememberSaveable(
-        saver = listSaver(
-            save = { it.toList() },
-            restore = { it.toMutableStateList() }
-        )
-    ) {
-        initialList.toMutableStateList()
-    }
-}
 
 @SuppressLint("QueryPermissionsNeeded")
 private fun shareData(context: Context, message: String) {
