@@ -142,6 +142,9 @@ fun CheckboxParentExample(
 
     val scrollState = rememberScrollState()
 
+    // Define a common button color for both buttons
+    val buttonColor = Color(0xFF2196F3)
+
     Column(modifier = modifier.verticalScroll(scrollState).padding(16.dp)) {
         if (materialOptions.isEmpty()) {
             Box(
@@ -265,7 +268,8 @@ fun CheckboxParentExample(
                     },
                     enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
                         checked && packageCounts.getOrNull(index)?.let { it > 0 } ?: false
-                    }.any { it }
+                    }.any { it },
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     Text("Hitung Total")
                 }
@@ -289,7 +293,7 @@ fun CheckboxParentExample(
                     enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
                         checked && packageCounts.getOrNull(index)?.let { it > 0 } ?: false
                     }.any { it },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     Text("Tambah ke Checkout")
                 }
@@ -316,9 +320,12 @@ fun CheckboxParentExample(
                 resultBuilder.appendLine(totalLine)
 
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = {
-                    shareData(context, resultBuilder.toString())
-                }) {
+                Button(
+                    onClick = {
+                        shareData(context, resultBuilder.toString())
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+                ) {
                     Text("Bagikan")
                 }
             }

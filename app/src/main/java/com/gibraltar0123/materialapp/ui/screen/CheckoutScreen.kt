@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -52,6 +54,43 @@ import com.gibraltar0123.materialapp.viewmodel.MaterialViewModel
 fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewModel) {
     var isGridView by remember { mutableStateOf(false) }
     val checkoutItems by viewModel.checkoutItems.collectAsState()
+
+    // State for managing the delete confirmation dialog
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<CheckoutItem?>(null) }
+
+    // Confirmation dialog
+    if (showDeleteDialog && itemToDelete != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+                itemToDelete = null
+            },
+            title = { Text("Konfirmasi Hapus") },
+            text = { Text("Apakah Anda yakin ingin menghapus ${itemToDelete?.name} dari checkout?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        itemToDelete?.let { viewModel.removeCheckoutItem(it) }
+                        showDeleteDialog = false
+                        itemToDelete = null
+                    }
+                ) {
+                    Text("Hapus", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        itemToDelete = null
+                    }
+                ) {
+                    Text("Batal")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -107,13 +146,19 @@ fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewMode
             if (isGridView) {
                 CheckoutGridView(
                     checkoutItems = checkoutItems,
-                    onDeleteClick = { viewModel.removeCheckoutItem(it) },
+                    onDeleteClick = { item ->
+                        itemToDelete = item
+                        showDeleteDialog = true
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
             } else {
                 CheckoutListView(
                     checkoutItems = checkoutItems,
-                    onDeleteClick = { viewModel.removeCheckoutItem(it) },
+                    onDeleteClick = { item ->
+                        itemToDelete = item
+                        showDeleteDialog = true
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
             }
