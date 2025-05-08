@@ -59,34 +59,31 @@ fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewMode
     var showDeleteDialog by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<CheckoutItem?>(null) }
 
-    // Confirmation dialog
+    // Confirmation dialog matching the style from MaterialFormScreen
     if (showDeleteDialog && itemToDelete != null) {
         AlertDialog(
-            onDismissRequest = {
-                showDeleteDialog = false
-                itemToDelete = null
-            },
-            title = { Text("Konfirmasi Hapus") },
-            text = { Text("Apakah Anda yakin ingin menghapus ${itemToDelete?.name} dari checkout?") },
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.delete_confirmation)) },
+            text = { Text("Apakah Anda yakin ingin menghapus ${itemToDelete?.name}?") },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        itemToDelete?.let { viewModel.removeCheckoutItem(it) }
+                        itemToDelete?.let { item ->
+                            viewModel.removeCheckoutItem(item)
+                        }
                         showDeleteDialog = false
                         itemToDelete = null
                     }
                 ) {
-                    Text("Hapus", color = Color.Red)
+                    Text(stringResource(R.string.delete), color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        itemToDelete = null
-                    }
-                ) {
-                    Text("Batal")
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                    itemToDelete = null
+                }) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

@@ -27,4 +27,6 @@
     <string name="delete_confirmation_message">Apakah Anda yakin ingin menghapus material \'%1$s\'?</string>
     <string name="delete">Hapus</string>
     <string name="cancel">Batal</string>
+
+
 </resources>
