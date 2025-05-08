@@ -55,11 +55,11 @@ fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewMode
     var isGridView by remember { mutableStateOf(false) }
     val checkoutItems by viewModel.checkoutItems.collectAsState()
 
-    // State for managing the delete confirmation dialog
+
     var showDeleteDialog by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<CheckoutItem?>(null) }
 
-    // Confirmation dialog matching the style from MaterialFormScreen
+
     if (showDeleteDialog && itemToDelete != null) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
