@@ -97,7 +97,7 @@ fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewMode
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primaryContainer
                         )
                     }
                 },
@@ -108,7 +108,7 @@ fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewMode
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF795548)
+                    containerColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
                     IconButton(onClick = { isGridView = !isGridView }) {
@@ -118,7 +118,7 @@ fun CheckoutScreen(navController: NavHostController, viewModel: MaterialViewMode
                                 else R.drawable.baseline_grid_view_24
                             ),
                             contentDescription = if (isGridView) "Switch to List View" else "Switch to Grid View",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.primaryContainer
                         )
                     }
                 }

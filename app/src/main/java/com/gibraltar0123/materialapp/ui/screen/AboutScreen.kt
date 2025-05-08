@@ -30,7 +30,7 @@ fun AboutScreen(navController: NavHostController) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primaryContainer
                         )
                     }
                 },
@@ -41,7 +41,7 @@ fun AboutScreen(navController: NavHostController) {
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF795548)
+                    containerColor = MaterialTheme.colorScheme.primary,
                 )
             )
         }

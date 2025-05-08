@@ -1,4 +1,4 @@
-package com.gibraltar0123.materialapp.ui.theme
+package com.gibraltar0123.materialapp.ui.theme.defaults
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,5 +1,6 @@
 package com.gibraltar0123.materialapp.model
 
+import androidx.annotation.DrawableRes
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,5 +11,5 @@ data class MaterialOption(
     val name: String,
     val pricePerPackage: Double,
     val stockPackage: Int,
-    val imageResId: Int
+    @DrawableRes val imageResId: Int
 )
