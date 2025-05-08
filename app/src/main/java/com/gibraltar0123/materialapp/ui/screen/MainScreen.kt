@@ -93,47 +93,24 @@ fun CheckboxParentExample(
     val context = LocalContext.current
     val materialOptions by viewModel.allMaterials.collectAsState(initial = emptyList())
 
-    // Update state lists whenever materialOptions changes size
+    // Manage checked states
     val childCheckedStates = remember(materialOptions.size) {
         mutableStateListOf<Boolean>().apply {
-            // Preserve existing checked states when list size changes
-            val previousSize = size
-            val newSize = materialOptions.size
-
-            // Add new items or remove extras to match materialOptions size
-            when {
-                newSize > previousSize -> {
-                    addAll(List(newSize - previousSize) { false })
-                }
-                newSize < previousSize -> {
-                    repeat(previousSize - newSize) {  removeAt(size - 1) }
-                }
-            }
+            repeat(materialOptions.size) { add(false) }
         }
     }
 
+    // Manage package counts
     val packageCounts = remember(materialOptions.size) {
         mutableStateListOf<Int>().apply {
-            // Preserve existing counts when list size changes
-            val previousSize = size
-            val newSize = materialOptions.size
-
-            // Add new items or remove extras to match materialOptions size
-            when {
-                newSize > previousSize -> {
-                    addAll(List(newSize - previousSize) { 0 })
-                }
-                newSize < previousSize -> {
-                    repeat(previousSize - newSize) {  removeAt(size - 1) }
-                }
-            }
+            repeat(materialOptions.size) { add(0) }
         }
     }
 
     var showTotal by rememberSaveable { mutableStateOf(false) }
+    var totalPrice by rememberSaveable { mutableStateOf(0.0) }
 
     val parentState = when {
-        childCheckedStates.isEmpty() -> androidx.compose.ui.state.ToggleableState.Off
         childCheckedStates.all { it } -> androidx.compose.ui.state.ToggleableState.On
         childCheckedStates.none { it } -> androidx.compose.ui.state.ToggleableState.Off
         else -> androidx.compose.ui.state.ToggleableState.Indeterminate
@@ -143,7 +120,6 @@ fun CheckboxParentExample(
 
     Column(modifier = modifier.verticalScroll(scrollState).padding(16.dp)) {
         if (materialOptions.isEmpty()) {
-            // Show empty state
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -157,7 +133,6 @@ fun CheckboxParentExample(
                 )
             }
         } else {
-            // Show material selection UI
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(id = R.string.select_all))
                 TriStateCheckbox(
@@ -173,80 +148,77 @@ fun CheckboxParentExample(
             }
 
             materialOptions.forEachIndexed { index, material ->
-                if (index < childCheckedStates.size) {  // Safety check
-                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = material.imageResId),
-                                contentDescription = material.name,
-                                modifier = Modifier
-                                    .size(180.dp)
-                                    .clickable {
-                                        // Navigate to edit screen when clicking on the image
-                                        navController.navigate(Screen.EditMaterial.createRoute(material.id))
-                                    }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column {
-                                Text(material.name)
-                                Text(
-                                    "Rp ${"%,.0f".format(material.pricePerPackage)} / paket",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    "Stok: ${material.stockPackage} paket",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                            Spacer(modifier = Modifier.weight(1f))
-                            Checkbox(
-                                checked = childCheckedStates[index],
-                                onCheckedChange = { isChecked ->
-                                    childCheckedStates[index] = isChecked
-                                    if (!isChecked) packageCounts[index] = 0
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = material.imageResId),
+                            contentDescription = material.name,
+                            modifier = Modifier
+                                .size(180.dp)
+                                .clickable {
+                                    navController.navigate(Screen.EditMaterial.createRoute(material.id))
                                 }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(material.name)
+                            Text(
+                                "Rp ${"%,.0f".format(material.pricePerPackage)} / paket",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                "Stok: ${material.stockPackage} paket",
+                                fontSize = 12.sp,
+                                color = Color.Gray
                             )
                         }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Checkbox(
+                            checked = childCheckedStates[index],
+                            onCheckedChange = { isChecked ->
+                                childCheckedStates[index] = isChecked
+                                if (!isChecked) packageCounts[index] = 0
+                            }
+                        )
+                    }
 
-                        if (childCheckedStates[index]) {
-                            var text by rememberSaveable { mutableStateOf(packageCounts[index].toString()) }
-                            var isError by rememberSaveable { mutableStateOf(false) }
+                    if (childCheckedStates[index]) {
+                        var text by rememberSaveable { mutableStateOf(packageCounts[index].toString()) }
+                        var isError by rememberSaveable { mutableStateOf(false) }
 
-                            TextField(
-                                value = text,
-                                onValueChange = { newText ->
-                                    if (newText.isEmpty() || newText.toIntOrNull() != null) {
-                                        text = newText
-                                        when (val number = newText.toIntOrNull()) {
-                                            null -> {
-                                                packageCounts[index] = 0
-                                                isError = false
-                                            }
-                                            in 1..material.stockPackage -> {
-                                                packageCounts[index] = number
-                                                isError = false
-                                            }
-                                            else -> {
-                                                isError = true
-                                            }
+                        TextField(
+                            value = text,
+                            onValueChange = { newText ->
+                                if (newText.isEmpty() || newText.toIntOrNull() != null) {
+                                    text = newText
+                                    when (val number = newText.toIntOrNull()) {
+                                        null -> {
+                                            packageCounts[index] = 0
+                                            isError = false
+                                        }
+                                        in 1..material.stockPackage -> {
+                                            packageCounts[index] = number
+                                            isError = false
+                                        }
+                                        else -> {
+                                            isError = true
                                         }
                                     }
-                                },
-                                label = { Text(stringResource(id = R.string.package_count_label)) },
-                                modifier = Modifier.width(180.dp),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                isError = isError
-                            )
+                                }
+                            },
+                            label = { Text(stringResource(id = R.string.package_count_label)) },
+                            modifier = Modifier.width(180.dp),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = isError
+                        )
 
-                            if (isError) {
-                                Text(
-                                    text = "Jumlah melebihi stok yang tersedia (${material.stockPackage})",
-                                    color = Color.Red,
-                                    fontSize = 12.sp
-                                )
-                            }
+                        if (isError) {
+                            Text(
+                                text = "Jumlah melebihi stok yang tersedia (${material.stockPackage})",
+                                color = Color.Red,
+                                fontSize = 12.sp
+                            )
                         }
                     }
                 }
@@ -255,7 +227,14 @@ fun CheckboxParentExample(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { showTotal = true },
+                onClick = {
+                    totalPrice = materialOptions.indices.sumOf { index ->
+                        if (childCheckedStates[index]) {
+                            materialOptions[index].pricePerPackage * packageCounts[index]
+                        } else 0.0
+                    }
+                    showTotal = true
+                },
                 enabled = childCheckedStates.any { it } && childCheckedStates.mapIndexed { index, checked ->
                     checked && packageCounts.getOrNull(index)?.let { it > 0 } ?: false
                 }.any { it }
@@ -266,17 +245,11 @@ fun CheckboxParentExample(
             Spacer(modifier = Modifier.height(8.dp))
 
             if (showTotal) {
-                val totalPrice = materialOptions.indices.sumOf { index ->
-                    if (index < childCheckedStates.size && childCheckedStates[index]) {
-                        materialOptions[index].pricePerPackage * packageCounts[index]
-                    } else 0.0
-                }
-
                 Text("Rincian Pembelian:", fontSize = 18.sp, color = Color.DarkGray)
 
                 val resultBuilder = StringBuilder("Rincian Pembelian:\n")
                 materialOptions.forEachIndexed { index, material ->
-                    if (index < childCheckedStates.size && childCheckedStates[index] && packageCounts[index] > 0) {
+                    if (childCheckedStates[index] && packageCounts[index] > 0) {
                         val subtotal = material.pricePerPackage * packageCounts[index]
                         val detail = "- ${material.name} x ${packageCounts[index]} = Rp ${"%,.0f".format(subtotal)}"
                         Text(detail, fontSize = 14.sp)

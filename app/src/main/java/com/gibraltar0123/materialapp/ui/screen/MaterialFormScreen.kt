@@ -11,7 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,7 +48,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MaterialFormScreen(
     navController: NavHostController,
-    viewModel: MaterialViewModel = viewModel(), // Use viewModel() to obtain the ViewModel
+    viewModel: MaterialViewModel = viewModel(),
     materialId: Long? = null
 ) {
     val scope = rememberCoroutineScope()
@@ -54,6 +57,9 @@ fun MaterialFormScreen(
     var name by rememberSaveable { mutableStateOf("") }
     var price by rememberSaveable { mutableStateOf("") }
     var stock by rememberSaveable { mutableStateOf("") }
+
+    // State for delete confirmation dialog
+    var showDeleteConfirmation by rememberSaveable { mutableStateOf(false) }
 
     val imageOptions = listOf(
         R.drawable.batamerah to "Bata",
@@ -75,20 +81,52 @@ fun MaterialFormScreen(
         }
     }
 
+    // Delete confirmation dialog
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text(stringResource(R.string.delete_confirmation)) },
+            text = { Text(stringResource(R.string.delete_confirmation_message, name)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            val material = viewModel.getMaterialById(materialId ?: 0L)
+                            material?.let {
+                                viewModel.delete(it)
+                                navController.popBackStack()
+                            }
+                        }
+                        showDeleteConfirmation = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete), color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = if (materialId == null) "Tambah Material" else "Edit Material",
+                        text = stringResource(
+                            if (materialId == null) R.string.add_material else R.string.edit_material
+                        ),
                         color = Color.White
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -110,7 +148,7 @@ fun MaterialFormScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Nama Material") },
+                label = { Text(stringResource(R.string.material_name)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -120,7 +158,7 @@ fun MaterialFormScreen(
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
-                label = { Text("Harga per Paket (Rp)") },
+                label = { Text(stringResource(R.string.price_per_package)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -131,7 +169,7 @@ fun MaterialFormScreen(
             OutlinedTextField(
                 value = stock,
                 onValueChange = { stock = it },
-                label = { Text("Stok Paket") },
+                label = { Text(stringResource(R.string.stock_package)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,7 +178,7 @@ fun MaterialFormScreen(
 
             // Image selection
             Text(
-                "Pilih Gambar Material",
+                stringResource(R.string.select_material_image),
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 8.dp)
                     .align(Alignment.Start)
@@ -186,27 +224,19 @@ fun MaterialFormScreen(
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
             ) {
-                Text(if (materialId == null) "Simpan Material" else "Update Material")
+                Text(stringResource(if (materialId == null) R.string.save_material else R.string.update_material))
             }
 
             // Delete button (only show when editing)
             if (materialId != null) {
                 Button(
-                    onClick = {
-                        scope.launch {
-                            val material = viewModel.getMaterialById(materialId)
-                            material?.let {
-                                viewModel.delete(it)
-                                navController.popBackStack()
-                            }
-                        }
-                    },
+                    onClick = { showDeleteConfirmation = true },  // Show confirmation dialog instead of direct delete
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 ) {
-                    Text("Hapus Material")
+                    Text(stringResource(R.string.delete_material))
                 }
             }
         }
