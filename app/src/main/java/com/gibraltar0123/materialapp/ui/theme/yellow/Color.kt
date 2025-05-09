@@ -1,4 +1,5 @@
 package com.gibraltar0123.materialapp.ui.theme.yellow
+
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF6D5E0F)

@@ -35,7 +35,13 @@ class MaterialViewModel(private val dao: MaterialDao) : ViewModel() {
     }
 
     // Update data material
-    fun update(id: Long, name: String, pricePerPackage: Double, stockPackage: Int, imageResId: Int) {
+    fun update(
+        id: Long,
+        name: String,
+        pricePerPackage: Double,
+        stockPackage: Int,
+        imageResId: Int
+    ) {
         val material = MaterialOption(
             id = id,
             name = name,
@@ -82,7 +88,8 @@ class MaterialViewModel(private val dao: MaterialDao) : ViewModel() {
             if (existingItemIndex != -1) {
                 // Update existing item
                 val existingItem = currentList[existingItemIndex]
-                currentList[existingItemIndex] = existingItem.copy(quantity = existingItem.quantity + newItem.quantity)
+                currentList[existingItemIndex] =
+                    existingItem.copy(quantity = existingItem.quantity + newItem.quantity)
             } else {
                 // Add new item
                 currentList.add(newItem)

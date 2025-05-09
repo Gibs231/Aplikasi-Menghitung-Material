@@ -22,6 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -31,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -55,11 +58,40 @@ fun MaterialFormScreen(
 ) {
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
+    val addMaterialTitle = stringResource(R.string.add_material)
+    val editMaterialTitle = stringResource(R.string.edit_material)
+    val backText = stringResource(R.string.back)
+    val materialNameLabel = stringResource(R.string.material_name)
+    val pricePerPackageLabel = stringResource(R.string.price_per_package)
+    val stockPackageLabel = stringResource(R.string.stock_package)
+    val selectMaterialImageText = stringResource(R.string.select_material_image)
+    val saveMaterialText = stringResource(R.string.save_material)
+    val updateMaterialText = stringResource(R.string.update_material)
+    val deleteMaterialText = stringResource(R.string.delete_material)
+    val deleteConfirmationTitle = stringResource(R.string.delete_confirmation)
+    val cancelButtonText = stringResource(R.string.cancel)
+    val deleteButtonText = stringResource(R.string.delete)
+    val errorSavingData = stringResource(R.string.error_saving_data)
+
+    val errorNameRequired = stringResource(R.string.error_name_required)
+    val errorPriceRequired = stringResource(R.string.error_price_required)
+    val errorPriceInvalidFormat = stringResource(R.string.error_price_invalid_format)
+    val errorPriceNegative = stringResource(R.string.error_price_negative)
+    val errorStockRequired = stringResource(R.string.error_stock_required)
+    val errorStockInvalidFormat = stringResource(R.string.error_stock_invalid_format)
+    val errorStockNegative = stringResource(R.string.error_stock_negative)
 
     var name by rememberSaveable { mutableStateOf("") }
     var price by rememberSaveable { mutableStateOf("") }
     var stock by rememberSaveable { mutableStateOf("") }
 
+
+    var nameError by rememberSaveable { mutableStateOf<String?>(null) }
+    var priceError by rememberSaveable { mutableStateOf<String?>(null) }
+    var stockError by rememberSaveable { mutableStateOf<String?>(null) }
 
     var showDeleteConfirmation by rememberSaveable { mutableStateOf(false) }
 
@@ -84,11 +116,79 @@ fun MaterialFormScreen(
     }
 
 
+    fun validateName(): Boolean {
+        return if (name.isBlank()) {
+            nameError = errorNameRequired
+            false
+        } else {
+            nameError = null
+            true
+        }
+    }
+
+    fun validatePrice(): Boolean {
+        return when {
+            price.isBlank() -> {
+                priceError = errorPriceRequired
+                false
+            }
+
+            price.toDoubleOrNull() == null -> {
+                priceError = errorPriceInvalidFormat
+                false
+            }
+
+            price.toDoubleOrNull()!! < 0 -> {
+                priceError = errorPriceNegative
+                false
+            }
+
+            else -> {
+                priceError = null
+                true
+            }
+        }
+    }
+
+    fun validateStock(): Boolean {
+        return when {
+            stock.isBlank() -> {
+                stockError = errorStockRequired
+                false
+            }
+
+            stock.toIntOrNull() == null -> {
+                stockError = errorStockInvalidFormat
+                false
+            }
+
+            stock.toIntOrNull()!! < 0 -> {
+                stockError = errorStockNegative
+                false
+            }
+
+            else -> {
+                stockError = null
+                true
+            }
+        }
+    }
+
+    fun validateAllFields(): Boolean {
+        val isNameValid = validateName()
+        val isPriceValid = validatePrice()
+        val isStockValid = validateStock()
+        return isNameValid && isPriceValid && isStockValid
+    }
+
     if (showDeleteConfirmation) {
+
+        val deleteConfirmationMessage = stringResource(R.string.delete_confirmation_message, name)
+
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text(stringResource(R.string.delete_confirmation)) },
-            text = { Text(stringResource(R.string.delete_confirmation_message, name)) },
+            title = { Text(deleteConfirmationTitle) },
+            text = { Text(deleteConfirmationMessage) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -102,12 +202,12 @@ fun MaterialFormScreen(
                         showDeleteConfirmation = false
                     }
                 ) {
-                    Text(stringResource(R.string.delete), color = Color.Red)
+                    Text(deleteButtonText, color = Color.Red)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmation = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(cancelButtonText)
                 }
             }
         )
@@ -118,9 +218,7 @@ fun MaterialFormScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(
-                            if (materialId == null) R.string.add_material else R.string.edit_material
-                        ),
+                        text = if (materialId == null) addMaterialTitle else editMaterialTitle,
                         color = Color.White
                     )
                 },
@@ -128,7 +226,7 @@ fun MaterialFormScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = backText
                         )
                     }
                 },
@@ -136,7 +234,8 @@ fun MaterialFormScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                 )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -149,38 +248,50 @@ fun MaterialFormScreen(
 
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
-                label = { Text(stringResource(R.string.material_name)) },
+                onValueChange = {
+                    name = it
+                    nameError = null
+                },
+                label = { Text(materialNameLabel) },
+                isError = nameError != null,
+                supportingText = { nameError?.let { Text(it) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             )
-
 
             OutlinedTextField(
                 value = price,
-                onValueChange = { price = it },
-                label = { Text(stringResource(R.string.price_per_package)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = {
+                    price = it
+                    priceError = null
+                },
+                label = { Text(pricePerPackageLabel) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = priceError != null,
+                supportingText = { priceError?.let { Text(it) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             )
-
 
             OutlinedTextField(
                 value = stock,
-                onValueChange = { stock = it },
-                label = { Text(stringResource(R.string.stock_package)) },
+                onValueChange = {
+                    stock = it
+                    stockError = null
+                },
+                label = { Text(stockPackageLabel) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = stockError != null,
+                supportingText = { stockError?.let { Text(it) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             )
 
-
             Text(
-                stringResource(R.string.select_material_image),
+                selectMaterialImageText,
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 8.dp)
                     .align(Alignment.Start)
@@ -202,41 +313,55 @@ fun MaterialFormScreen(
                 }
             }
 
-
             Button(
                 onClick = {
-                    val priceValue = price.toDoubleOrNull() ?: 0.0
-                    val stockValue = stock.toIntOrNull() ?: 0
+                    if (validateAllFields()) {
+                        val priceValue = price.toDouble()
+                        val stockValue = stock.toInt()
 
-                    scope.launch {
-                        if (materialId == null) {
-
-                            viewModel.insert(name, priceValue, stockValue, selectedImageResId)
-                        } else {
-
-                            viewModel.update(materialId, name, priceValue, stockValue, selectedImageResId)
+                        scope.launch {
+                            try {
+                                if (materialId == null) {
+                                    viewModel.insert(
+                                        name,
+                                        priceValue,
+                                        stockValue,
+                                        selectedImageResId
+                                    )
+                                } else {
+                                    viewModel.update(
+                                        materialId,
+                                        name,
+                                        priceValue,
+                                        stockValue,
+                                        selectedImageResId
+                                    )
+                                }
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                snackbarHostState.showSnackbar(errorSavingData)
+                            }
                         }
-
-                        navController.popBackStack()
                     }
                 },
-                enabled = name.isNotBlank() && price.isNotBlank() && stock.isNotBlank(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
             ) {
-                Text(stringResource(if (materialId == null) R.string.save_material else R.string.update_material))
+                Text(if (materialId == null) saveMaterialText else updateMaterialText)
             }
 
             if (materialId != null) {
                 Button(
-                    onClick = { showDeleteConfirmation = true },  // Show confirmation dialog instead of direct delete
+                    onClick = {
+                        showDeleteConfirmation = true
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 ) {
-                    Text(stringResource(R.string.delete_material))
+                    Text(deleteMaterialText)
                 }
             }
         }

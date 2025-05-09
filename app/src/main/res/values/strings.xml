@@ -28,5 +28,14 @@
     <string name="delete">Hapus</string>
     <string name="cancel">Batal</string>
 
+    <string name="error_name_required">Nama material tidak boleh kosong</string>
+    <string name="error_price_required">Harga tidak boleh kosong</string>
+    <string name="error_price_invalid_format">Format harga tidak valid</string>
+    <string name="error_price_negative">Harga tidak boleh negatif</string>
+    <string name="error_stock_required">Stok tidak boleh kosong</string>
+    <string name="error_stock_invalid_format">Format stok tidak valid, masukkan angka bulat</string>
+    <string name="error_stock_negative">Stok tidak boleh negatif</string>
+    <string name="error_saving_data">Terjadi kesalahan saat menyimpan data</string>
+
 
 </resources>

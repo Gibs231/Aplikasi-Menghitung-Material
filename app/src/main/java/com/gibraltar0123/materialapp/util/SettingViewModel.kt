@@ -9,11 +9,9 @@ import kotlinx.coroutines.launch
 class SettingViewModel(private val dataStore: SettingDataStore) : ViewModel() {
 
 
-
     val isYellowTheme = dataStore.isYellowThemeFlow.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
-
 
 
     fun toggleYellowTheme() {
